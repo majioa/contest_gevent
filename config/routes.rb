@@ -1,4 +1,14 @@
 Rails.application.routes.draw do
+  get 'group_event/new'
+
+  get 'group_event/create'
+
+  get 'group_event/delete'
+
+  get 'group_event/show'
+
+  get 'group_event/update'
+
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
 
