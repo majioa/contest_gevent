@@ -2,18 +2,22 @@ require 'rails_helper'
 
 RSpec.describe GroupEvent, type: :model do
 
-#       The event also has a name, description (which supports formatting) and location.
-#       The event should be draft or published.
-#       To publish all of the fields are required,
-#       it can be saved with only a subset of fields before it’s published.
 #       When the event is deleted/remove it should be kept in the database and marked as such.
 
    let( :today ) { Date.today.to_date }
 
    describe 'Group event model' do
+      let( :its ) { GroupEvent }
+
       it { should have_a_bitfield :flags }
       it { should validate_presence_of( :start_at ) }
       it { should validate_presence_of( :end_at ) }
+
+      # NOTE The event also has a name, description (which supports formatting) and
+      # location.
+      it { should have_db_column( :name ) }
+      it { should have_db_column( :description ) }
+      it { should have_db_column( :location ) }
    end
 
    describe 'Group event duration' do
@@ -38,21 +42,33 @@ RSpec.describe GroupEvent, type: :model do
       end
    end
 
-   describe 'Group event will have end_at' do
+   describe 'Group event time fields' do
       # NOTE: There should be attributes to set the start, end or duration
       # of the event (and calculate the other value).
 
-      let( :event_started_at ) { GroupEvent.create( start_at: today ) }
-      let( :event_ended_at ) { GroupEvent.create( end_at: today + 30 ) }
-
       context 'when begin_at and short duration' do
+         let( :event_started_at ) { GroupEvent.create( start_at: today ) }
+
          it { expect( event_started_at.start_at.to_date ).to eq( today ) }
          it { expect( event_started_at.end_at.to_date ).to eq( today + 30) }
       end
 
       context 'when end_at and short duration' do
+         let( :event_ended_at ) { GroupEvent.create( end_at: today + 30 ) }
+
          it { expect( event_ended_at.start_at.to_date ).to eq( today ) }
          it { expect( event_ended_at.end_at.to_date ).to eq( today + 30 ) }
+      end
+   end
+
+   describe 'Group event' do
+      # NOTE The event should be draft or published. To publish all of the fields are
+      # required, it can be saved with only a subset of fields before it’s published.
+      context "if is published" do
+         before { allow( subject ).to receive( :published? ).and_return( true ) }
+         it { should validate_presence_of( :name ) }
+         it { should validate_presence_of( :description ) }
+         it { should validate_presence_of( :location ) }
       end
    end
 end

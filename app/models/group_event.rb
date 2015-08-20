@@ -9,6 +9,7 @@ class GroupEvent < ActiveRecord::Base
    before_validation :fix_dates
 
    validates :start_at, :end_at, presence: true
+   validates :name, :description, :location, presence: true, if: :published?
 
    private
 
