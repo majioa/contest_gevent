@@ -2,9 +2,9 @@ require 'rails_helper'
 
 RSpec.describe GroupEvent, type: :model do
 
-#       When the event is deleted/remove it should be kept in the database and marked as such.
-
-   let( :today ) { Date.today.to_date }
+   def today
+      Date.today.to_date
+   end
 
    describe 'Group event model' do
       let( :its ) { GroupEvent }
@@ -61,7 +61,7 @@ RSpec.describe GroupEvent, type: :model do
       end
    end
 
-   describe 'Group event' do
+   describe 'Group event behaviour' do
       # NOTE The event should be draft or published. To publish all of the fields are
       # required, it can be saved with only a subset of fields before it’s published.
       context "if is published" do
@@ -71,4 +71,23 @@ RSpec.describe GroupEvent, type: :model do
          it { should validate_presence_of( :location ) }
       end
    end
+
+   describe 'Group event behaviour' do
+      context "if is removed" do
+         # NOTE: When the event is deleted/remove it should be kept in the database and
+         # marked as such.
+         before( :all ) do
+            @event = GroupEvent.create( start_at: today )
+            @event.destroy
+         end
+
+         it { expect( @event ).to be_removed }
+         it do
+            expect do
+               @event.update_attribute( :name, "Name" )
+            end.to raise_error( ActiveRecord::ReadOnlyRecord )
+         end
+      end
+   end
+
 end
