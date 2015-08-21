@@ -42,6 +42,7 @@ gem 'spring',        group: :development
 
 group :test do
    gem 'rspec-rails'
+   gem 'json_spec'
    gem 'shoulda-matchers'
    gem 'database_cleaner'
    gem 'pry'
