@@ -6,7 +6,8 @@ class GroupEvent < ActiveRecord::Base
             2 => :removed,
             4 => :long
 
-   before_validation :fix_dates
+   before_validation :fillin_dates
+   before_save :fix_dates
 
    validates :start_at, :end_at, presence: true
    validates :name, :description, :location, presence: true, if: :published?
@@ -27,11 +28,16 @@ class GroupEvent < ActiveRecord::Base
       self.long? && 60 || 30
    end
 
-   def fix_dates
+   def fillin_dates
       if self.start_at?
-         write_attribute( :end_at, ( self.start_at.to_date + duration ).to_time )
+         write_attribute( :end_at, ( self.start_at.to_date + duration ) )
       elsif self.end_at?
-         write_attribute( :start_at, ( self.end_at.to_date - duration ).to_time )
+         write_attribute( :start_at, ( self.end_at.to_date - duration ) )
       end
+   end
+
+   def fix_dates
+      write_attribute( :start_at, self.start_at.to_datetime )
+      write_attribute( :end_at, self.end_at.to_datetime )
    end
 end

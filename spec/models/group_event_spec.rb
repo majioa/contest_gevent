@@ -3,8 +3,12 @@ require 'rails_helper'
 RSpec.describe GroupEvent, type: :model do
 
    def today
-      Date.today.to_date
+      Time.now.utc.to_date
    end
+
+   let( :today_time ) { today.to_datetime.utc }
+   let( :plus30_time ) { ( today + 30 ).to_datetime }
+   let( :plus60_time ) { ( today + 60 ).to_datetime }
 
    describe 'Group event model' do
       let( :its ) { GroupEvent }
@@ -26,8 +30,8 @@ RSpec.describe GroupEvent, type: :model do
          let( :long_event ) { GroupEvent.create( start_at: today, long: true ) }
 
          it { expect( long_event ).to be_long }
-         it { expect( long_event.start_at.to_date ).to eq( today ) }
-         it { expect( long_event.end_at.to_date ).to eq( today + 60 ) }
+         it { expect( long_event.start_at ).to eq( today_time ) }
+         it { expect( long_event.end_at ).to eq( plus60_time ) }
       end
 
       context 'when duration is changed' do
@@ -37,8 +41,8 @@ RSpec.describe GroupEvent, type: :model do
 
          before( :each ) { changed_event.update_attribute( :long, true ) }
          it { expect( changed_event ).not_to be_long }
-         it { expect( changed_event.start_at.to_date ).to eq( today ) }
-         it { expect( changed_event.end_at.to_date ).to eq( today + 30 ) }
+         it { expect( changed_event.start_at ).to eq( today_time ) }
+         it { expect( changed_event.end_at ).to eq( plus30_time ) }
       end
    end
 
@@ -49,15 +53,15 @@ RSpec.describe GroupEvent, type: :model do
       context 'when begin_at and short duration' do
          let( :event_started_at ) { GroupEvent.create( start_at: today ) }
 
-         it { expect( event_started_at.start_at.to_date ).to eq( today ) }
-         it { expect( event_started_at.end_at.to_date ).to eq( today + 30) }
+         it { expect( event_started_at.start_at ).to eq( today_time ) }
+         it { expect( event_started_at.end_at ).to eq( plus30_time ) }
       end
 
       context 'when end_at and short duration' do
-         let( :event_ended_at ) { GroupEvent.create( end_at: today + 30 ) }
+         let( :event ) { GroupEvent.create( end_at: plus30_time ) }
 
-         it { expect( event_ended_at.start_at.to_date ).to eq( today ) }
-         it { expect( event_ended_at.end_at.to_date ).to eq( today + 30 ) }
+         it { expect( event.start_at ).to eq( today_time ) }
+         it { expect( event.end_at ).to eq( plus30_time ) }
       end
    end
 
