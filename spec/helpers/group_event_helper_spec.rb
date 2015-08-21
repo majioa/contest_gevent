@@ -10,5 +10,5 @@ require 'rails_helper'
 #     end
 #   end
 # end
-RSpec.describe GroupEventHelper, type: :helper do
+RSpec.describe GroupEventsHelper, type: :helper do
 end
