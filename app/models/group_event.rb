@@ -17,11 +17,8 @@ class GroupEvent < ActiveRecord::Base
    end
 
    def readonly?
-      if self.bitfield_changes[ 'removed' ] == [ false, true ]
-         super
-      else
-         self.removed? || super
-      end
+      x = self.bitfield_changes[ 'removed' ] != [ false, true ]
+      x && self.removed? || super
    end
 
    private
